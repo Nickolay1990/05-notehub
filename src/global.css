@@ -1,0 +1,30 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+ul,
+ol {
+	list-style-type: none;
+}
+
+img {
+	max-width: 100%;
+	display: block;
+}
+
+button {
+	display: block;
+	cursor: pointer;
+}
+
+a {
+	text-decoration: none;
+	color: currentColor;
+	transition: color 250ms;
+}
+
+input,
+select {
+	outline: none;
+}

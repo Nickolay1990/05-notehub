@@ -1,11 +1,17 @@
 import axios from 'axios';
-import type { Note, OrderFormValues } from '../types/note';
+import type { Note } from '../types/note';
 
 const API_KEY = import.meta.env.VITE_NOTEHUB_TOKEN;
 
 interface NotesResponse {
 	notes: Note[];
 	totalPages: number;
+}
+
+export interface createNoteValues {
+	title: string;
+	content?: string;
+	tag: 'Work' | 'Personal' | 'Meeting' | 'Shopping' | 'Todo';
 }
 
 interface SearchParams {
@@ -17,8 +23,8 @@ interface SearchParams {
 axios.defaults.baseURL = 'https://notehub-public.goit.study/api';
 axios.defaults.headers.common['Authorization'] = `Bearer ${API_KEY}`;
 
-export async function fetchNotes(page: number, search: string): Promise<NotesResponse> {
-	const params: SearchParams = { page, perPage: 5 };
+export async function fetchNotes(page: number, perPage: number, search: string): Promise<NotesResponse> {
+	const params: SearchParams = { page, perPage };
 
 	if (search) params.search = search;
 
@@ -29,7 +35,7 @@ export async function fetchNotes(page: number, search: string): Promise<NotesRes
 	return res.data;
 }
 
-export async function createNote({ title, content, tag }: OrderFormValues): Promise<Note> {
+export async function createNote({ title, content, tag }: createNoteValues): Promise<Note> {
 	const res = await axios.post<Note>('/notes', {
 		title,
 		content,

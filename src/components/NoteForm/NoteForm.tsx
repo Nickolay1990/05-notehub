@@ -4,14 +4,19 @@ import type { FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createNote } from '../../services/noteService';
-import type { OrderFormValues } from '../../types/note';
 import ErrorMessageText from '../ErrorMessage/ErrorMessage';
 
 interface NoteFormProps {
-	closeModal: () => void;
+	onClose: () => void;
 }
 
-const initialValues: OrderFormValues = {
+interface NoteFormValues {
+	title: string;
+	content?: string;
+	tag: 'Work' | 'Personal' | 'Meeting' | 'Shopping' | 'Todo';
+}
+
+const initialValues: NoteFormValues = {
 	title: '',
 	content: '',
 	tag: 'Todo',
@@ -23,20 +28,20 @@ const Schema = Yup.object().shape({
 	tag: Yup.string().oneOf(['Todo', 'Work', 'Personal', 'Meeting', 'Shopping'], 'Invalid tag value').required('Tag is required'),
 });
 
-export default function NoteForm({ closeModal }: NoteFormProps) {
+export default function NoteForm({ onClose }: NoteFormProps) {
 	const queryClient = useQueryClient();
 
 	const mutation = useMutation({
-		mutationFn: async (task: OrderFormValues) => createNote(task),
+		mutationFn: async (task: NoteFormValues) => createNote(task),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['tasks'], exact: false });
-			closeModal();
+			queryClient.invalidateQueries({ queryKey: ['notes'], exact: false });
+			onClose();
 		},
 	});
 
 	const { isPending, isError } = mutation;
 
-	const handleCreateTask = (values: OrderFormValues, actions: FormikHelpers<OrderFormValues>) => {
+	const handleCreateTask = (values: NoteFormValues, actions: FormikHelpers<NoteFormValues>) => {
 		mutation.mutate(values);
 		actions.resetForm();
 	};
@@ -69,7 +74,7 @@ export default function NoteForm({ closeModal }: NoteFormProps) {
 				</div>
 
 				<div className={css.actions}>
-					<button type="button" className={css.cancelButton} onClick={closeModal}>
+					<button type="button" className={css.cancelButton} onClick={onClose}>
 						Cancel
 					</button>
 					<button type="submit" className={css.submitButton} disabled={isPending ? true : false}>

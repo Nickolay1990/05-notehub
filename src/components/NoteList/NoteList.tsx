@@ -4,24 +4,32 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteNote } from '../../services/noteService';
 import { BarLoader } from 'react-spinners';
 import ErrorMessage from '../ErrorMessage/ErrorMessage';
+import { useState } from 'react';
 
 interface NoteListProps {
 	notes: Note[];
 }
 
 export default function NoteList({ notes }: NoteListProps) {
+	const [deletingNoteId, setDeletingNoteId] = useState<number | null>(null);
+
 	const queryClient = useQueryClient();
 
 	const mutation = useMutation({
 		mutationFn: async (id: number) => deleteNote(id),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['tasks'] });
+			queryClient.invalidateQueries({ queryKey: ['notes'] });
+			setDeletingNoteId(null);
+		},
+		onError: () => {
+			setDeletingNoteId(null);
 		},
 	});
 
 	const { isPending, isError } = mutation;
 
 	const handleDelete = (id: number) => {
+		setDeletingNoteId(id);
 		mutation.mutate(id);
 	};
 
@@ -35,8 +43,12 @@ export default function NoteList({ notes }: NoteListProps) {
 							<p className={cssStyles.content}>{note.content}</p>
 							<div className={cssStyles.footer}>
 								<span className={cssStyles.tag}>{note.tag}</span>
-								<button className={cssStyles.button} onClick={() => handleDelete(note.id)}>
-									{!isPending ? 'Delete' : 'In progress'}
+								<button
+									className={cssStyles.button}
+									onClick={() => handleDelete(note.id)}
+									disabled={deletingNoteId === note.id}
+								>
+									{deletingNoteId === note.id ? 'Delete' : 'In progress'}
 								</button>
 							</div>
 						</li>

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import css from './App.module.css';
 import NoteList from '../NoteList/NoteList';
 import { fetchNotes } from '../../services/noteService';
@@ -17,21 +17,36 @@ export default function App() {
 	const [debouncedText] = useDebounce(searchQuery, 300);
 
 	const { data, isSuccess, isPending, isError } = useQuery({
-		queryKey: ['tasks', currentPage, debouncedText],
-		queryFn: () => fetchNotes(currentPage, debouncedText),
+		queryKey: ['notes', currentPage, debouncedText],
+		queryFn: () => fetchNotes(currentPage, 12, debouncedText),
+		placeholderData: keepPreviousData,
 	});
 
 	useEffect(() => {
 		setCurrentPage(1);
 	}, [debouncedText]);
 
+	function handleSearchChange(value: string) {
+		setSearchQuery(value);
+	}
+
+	function handlPageChange(page: number) {
+		setCurrentPage(page);
+	}
+
 	return (
 		<div className={css.app}>
 			<header className={css.toolbar}>
-				<SearchBox onChange={setSearchQuery} />
+				<SearchBox inputValue={searchQuery} onChange={handleSearchChange} />
 
 				{isSuccess && data.totalPages > 1 && (
-					<Pagination totalPages={data.totalPages} setPage={setCurrentPage} currentPage={currentPage} />
+					<Pagination
+						totalPages={data.totalPages}
+						setPage={handlPageChange}
+						currentPage={currentPage}
+						pageRangeDisplayed={5}
+						marginPagesDisplayed={1}
+					/>
 				)}
 
 				<button className={css.button} onClick={() => setIsOpenModal(true)}>
@@ -40,7 +55,7 @@ export default function App() {
 			</header>
 			{isSuccess && data.notes.length > 0 && <NoteList notes={data.notes} />}
 			{isError && <ErrorMessage />}
-			{isModalOpen && <NoteModal closeModal={() => setIsOpenModal(false)} />}
+			{isModalOpen && <NoteModal onClose={() => setIsOpenModal(false)} />}
 			{isPending && (
 				<BarLoader
 					cssOverride={{

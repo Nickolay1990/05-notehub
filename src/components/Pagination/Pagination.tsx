@@ -5,20 +5,36 @@ interface PaginationProps {
 	totalPages: number;
 	setPage: (page: number) => void;
 	currentPage: number;
+	pageRangeDisplayed: number;
+	marginPagesDisplayed: number;
+	containerClassName?: string;
+	activeClassName?: string;
+	nextLabel?: string;
+	previousLabel?: string;
 }
 
-export default function Pagination({ totalPages, setPage, currentPage }: PaginationProps) {
+export default function Pagination({
+	totalPages,
+	setPage,
+	currentPage,
+	pageRangeDisplayed,
+	marginPagesDisplayed,
+	containerClassName,
+	activeClassName,
+	nextLabel,
+	previousLabel,
+}: PaginationProps) {
 	return (
 		<ReactPaginate
 			pageCount={totalPages}
-			pageRangeDisplayed={5}
-			marginPagesDisplayed={1}
+			pageRangeDisplayed={pageRangeDisplayed}
+			marginPagesDisplayed={marginPagesDisplayed}
 			onPageChange={({ selected }) => setPage(selected + 1)}
 			forcePage={currentPage - 1}
-			containerClassName={css.pagination}
-			activeClassName={css.active}
-			nextLabel="→"
-			previousLabel="←"
+			containerClassName={containerClassName ? containerClassName : css.pagination}
+			activeClassName={activeClassName ? activeClassName : css.active}
+			nextLabel={nextLabel ? nextLabel : '→'}
+			previousLabel={previousLabel ? previousLabel : '←'}
 		/>
 	);
 }

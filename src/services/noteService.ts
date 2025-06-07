@@ -16,14 +16,15 @@ export interface createNoteValues {
 
 interface SearchParams {
 	page: number;
-	search?: string;
 	perPage: number;
+	search?: string;
 }
 
 axios.defaults.baseURL = 'https://notehub-public.goit.study/api';
 axios.defaults.headers.common['Authorization'] = `Bearer ${API_KEY}`;
 
-export async function fetchNotes(page: number, perPage: number, search: string): Promise<NotesResponse> {
+export async function fetchNotes(search: string, page: number): Promise<NotesResponse> {
+	const perPage = 12;
 	const params: SearchParams = { page, perPage };
 
 	if (search) params.search = search;

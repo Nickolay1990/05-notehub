@@ -17,8 +17,8 @@ export default function App() {
 	const [debouncedText] = useDebounce(searchQuery, 300);
 
 	const { data, isSuccess, isPending, isError } = useQuery({
-		queryKey: ['notes', currentPage, debouncedText],
-		queryFn: () => fetchNotes(currentPage, 12, debouncedText),
+		queryKey: ['notes', debouncedText, currentPage],
+		queryFn: () => fetchNotes(debouncedText, currentPage),
 		placeholderData: keepPreviousData,
 	});
 
@@ -30,7 +30,7 @@ export default function App() {
 		setSearchQuery(value);
 	}
 
-	function handlPageChange(page: number) {
+	function handlePageChange(page: number) {
 		setCurrentPage(page);
 	}
 
@@ -42,7 +42,7 @@ export default function App() {
 				{isSuccess && data.totalPages > 1 && (
 					<Pagination
 						totalPages={data.totalPages}
-						setPage={handlPageChange}
+						setPage={handlePageChange}
 						currentPage={currentPage}
 						pageRangeDisplayed={5}
 						marginPagesDisplayed={1}

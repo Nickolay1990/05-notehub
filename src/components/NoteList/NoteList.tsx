@@ -11,12 +11,12 @@ interface NoteListProps {
 }
 
 export default function NoteList({ notes }: NoteListProps) {
-	const [deletingNoteId, setDeletingNoteId] = useState<number | null>(null);
+	const [deletingNoteId, setDeletingNoteId] = useState<Note['id'] | null>(null);
 
 	const queryClient = useQueryClient();
 
 	const mutation = useMutation({
-		mutationFn: async (id: number) => deleteNote(id),
+		mutationFn: async (id: Note['id']) => deleteNote(id),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['notes'] });
 			setDeletingNoteId(null);
@@ -26,7 +26,7 @@ export default function NoteList({ notes }: NoteListProps) {
 		},
 	});
 
-	const { isPending, isError } = mutation;
+	const { isError } = mutation;
 
 	const handleDelete = (id: number) => {
 		setDeletingNoteId(id);
@@ -48,23 +48,15 @@ export default function NoteList({ notes }: NoteListProps) {
 									onClick={() => handleDelete(note.id)}
 									disabled={deletingNoteId === note.id}
 								>
-									{deletingNoteId === note.id ? 'Delete' : 'In progress'}
+									{deletingNoteId !== note.id ? 'Delete' : 'In progress'}
+									{deletingNoteId === note.id && <BarLoader color="#ffffff" width={80} height={4} />}
 								</button>
 							</div>
 						</li>
 					);
 				})}
 			</ul>
-			{isPending && (
-				<BarLoader
-					cssOverride={{
-						display: 'block',
-						margin: '0 auto',
-						backgroundColor: 'red',
-						width: '500px',
-					}}
-				/>
-			)}
+
 			{isError && <ErrorMessage />}
 		</>
 	);

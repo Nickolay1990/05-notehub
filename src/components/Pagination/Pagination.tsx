@@ -5,8 +5,8 @@ interface PaginationProps {
 	totalPages: number;
 	setPage: (page: number) => void;
 	currentPage: number;
-	pageRangeDisplayed: number;
-	marginPagesDisplayed: number;
+	pageRangeDisplayed?: number;
+	marginPagesDisplayed?: number;
 	containerClassName?: string;
 	activeClassName?: string;
 	nextLabel?: string;
@@ -17,8 +17,8 @@ export default function Pagination({
 	totalPages,
 	setPage,
 	currentPage,
-	pageRangeDisplayed,
-	marginPagesDisplayed,
+	pageRangeDisplayed = 5,
+	marginPagesDisplayed = 1,
 	containerClassName,
 	activeClassName,
 	nextLabel,
